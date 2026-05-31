@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+
+  orders      Order[]
+  maker_fills Fill[]  @relation(name: "user_maker_fills")
+  taker_fills Fill[]  @relation(name: "user_taker_fills")
+}
+
+model Market {
+  id        String @id @default(uuid())
+  slug      String @unique
+  image_url String
+}
+
+model Order {
+  id             String      @id @default(uuid())
+  user_id        String
+  market_id      String
+  orderType      OrderType
+  side           Side
+  price          String
+  slippage       Int
+  qty            String
+  initial_margin String
+  filledQty      String
+  status         OrderStatus
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt()
+
+  user User @relation(fields: [user_id], references: [id])
+
+  maker_fills Fill[] @relation("order_maker_fills")
+  taker_fills Fill[] @relation("order_taker_fills")
+}
+
+model Fill {
+  id             String   @id @default(uuid())
+  maker_id       String
+  taker_id       String
+  qty            String
+  price          String
+  maker_order_id String
+  taker_order_id String
+  market_id      String
+  created_at     DateTime @default(now())
+
+  maker_order Order @relation(name: "order_maker_fills", fields: [maker_order_id], references: [id])
+  taker_order Order @relation(name: "order_taker_fills", fields: [taker_order_id], references: [id])
+
+  maker_user User @relation(name: "user_maker_fills", fields: [maker_id], references: [id])
+  taker_user User @relation(name: "user_taker_fills", fields: [taker_id], references: [id])
+}
+
+enum OrderType {
+  Market
+  Limit
+}
+
+enum Side {
+  Bid
+  Ask
+}
+
+enum OrderStatus {
+  Filled
+  PartiallyFilled
+  Cancelled
+  Open
+}
