@@ -9,8 +9,10 @@ import jwt from "jsonwebtoken";
 async function signupController(req: Request, res: Response) {
   const { username, password } = req.body;
 
+  console.log(username, password);
+
   if (!username || !password) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: "Signup failed!",
     });
@@ -52,7 +54,7 @@ async function signinController(req: Request, res: Response) {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
       message: "Signin failed!",
     });

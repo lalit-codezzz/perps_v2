@@ -8,6 +8,6 @@ import {
 const authRouter = Router();
 
 authRouter.post("/signup", signupController);
-authRouter.post("/signup", signinController);
+authRouter.post("/signin", signinController);
 
 export default authRouter;
